@@ -144,7 +144,7 @@ const open = async file => {
 
 const getCSS = ({
     lineHeight, justify, hyphenate, invert, theme, overrideFont, userStylesheet,
-    mediaActiveClass,
+    mediaActiveClass, dontAside
 }) => [`
     @namespace epub "http://www.idpf.org/2007/ops";
     @media print {
@@ -171,9 +171,7 @@ const getCSS = ({
                 color: ${invert ? theme.inverted.link : theme.dark.link};
             }
         }
-        aside[epub|type~="footnote"] {
-            display: none;
-        }
+        ${dontAside ? "" : 'aside[epub|type~="footnote"] { display: none; }'}
     }
     html {
         line-height: ${lineHeight};
@@ -368,7 +366,7 @@ class Reader {
             renderer.setAttribute('flow', 'scrolled')
             renderer.setAttribute('margin', '12px')
             renderer.setAttribute('gap', '5%')
-            renderer.setStyles(getCSS(this.style))
+            renderer.setStyles(getCSS({...this.style, dontAside: true}))
         })
         this.#footnoteHandler.addEventListener('render', e => {
             const { href, hidden, type } = e.detail
